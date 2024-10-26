@@ -1,0 +1,119 @@
+<h1>Calificaciones</h1>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="card">
+                <div class="card-header"><h4>Rendimiento individual (fijo)</h4></div>    
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">
+                            <canvas id="myChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="card">
+                <div class="card-header"><h4>Rendimiento individual (simulando base de datos)</h4></div>    
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">
+                            <canvas id="myChart2"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        window.addEventListener("load", onLoad);
+
+        function onLoad() {
+            crearGraficaFija();
+            crearGraficaBd();
+        }
+
+        function crearGraficaFija(){
+            const ctx = document.getElementById('myChart');
+
+            new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: [
+                        'Cálculo',
+                        'Base de Datos',
+                        'Aplicaciones Web',
+                        'Temas de Física',
+                        'Ecología',
+                        'Inglés V'
+                    ],
+                    datasets: [{
+                        label: 'Calificación',
+                        data: [10, 8, 7, 5, 7, 6],
+                        fill: true,
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderColor: 'rgb(255, 99, 132)',
+                        pointBackgroundColor: 'rgb(255, 99, 132)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgb(255, 99, 132)'
+                    }]
+                },
+                options: {
+                    elements: {
+                        line: {
+                            borderWidth: 3
+                        }
+                    }
+                }
+            });
+        }
+        
+        async function crearGraficaBd(){
+            let resp = await fetch("/api/graficas/rendimiento-individual");
+            if(!resp.ok) {
+                alert("Error al consultar el servicio de datos para la gráfica");
+                return;
+            }
+
+            const datos = await resp.json();
+            const labels = datos.map(x => x.Materia);
+            const data = datos.map(x => x.Calificacion);
+
+            const ctx = document.getElementById('myChart2');
+
+            new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Calificación',
+                        data: data,
+                        fill: true,
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderColor: 'rgb(255, 99, 132)',
+                        pointBackgroundColor: 'rgb(255, 99, 132)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgb(255, 99, 132)'
+                    }]
+                },
+                options: {
+                    elements: {
+                        line: {
+                            borderWidth: 3
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+
+}
